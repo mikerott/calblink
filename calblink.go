@@ -319,7 +319,7 @@ func printStartInfo(userPrefs *userPrefs) {
 	if len(userPrefs.excludes) > 0 {
 		fmt.Fprintln(debugOut, "Excluded events:")
 		for item := range userPrefs.excludes {
-			fmt.Printf("   %v\n", item)
+			fmt.Fprintf(debugOut, "   %v\n", item)
 		}
 	}
 	skipDays := ""
@@ -332,7 +332,7 @@ func printStartInfo(userPrefs *userPrefs) {
 		}
 	}
 	if len(skipDays) > 0 {
-		fmt.Println("Skip days: " + skipDays)
+		fmt.Fprintln(debugOut, "Skip days: " + skipDays)
 	}
 	timeString := ""
 	if userPrefs.startTime != nil {
@@ -348,7 +348,7 @@ func printStartInfo(userPrefs *userPrefs) {
 		timeString += endTimeString
 	}
 	if len(timeString) > 0 {
-		fmt.Println(timeString)
+		fmt.Fprintln(debugOut, timeString)
 	}
 }
 
