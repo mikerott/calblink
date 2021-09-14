@@ -41,13 +41,6 @@ To use calblink, you need the following:
     go mod vendor
     ```
 
-    Or
-
-    ```
-    go get -u google.golang.org/api/calendar/v3
-    go get -u golang.org/x/oauth2/...
-    ```
-
 5.  Get an OAuth 2 ID as described in step 1 of the [Google Calendar
     Quickstart](https://developers.google.com/google-apps/calendar/quickstart/go).
     Put the credentials.json file in your GOPATH directory.

@@ -112,12 +112,11 @@ type prefLayout struct {
 }
 
 var (
-	black               = "{\"color\":\"#000000\"}"
-	green               = "{\"color\":\"#00FF00\"}"
-	yellow              = "{\"color\":\"#FFFF00\"}"
-	orange              = "{\"color\":\"#FFA500\"}"
-	orangeFlashInfinite = "{\"pattern\":\"orange flash infinite\"}" // pattern must exist in the Blink(1) UI tool
-	errorPattern        = "{\"pattern\":\"error\"}"                 // pattern must exist in the Blink(1) UI tool
+	black        = "{\"color\":\"#000000\"}"
+	green        = "{\"color\":\"#00FF00\"}"
+	yellow       = "{\"color\":\"#FFFF00\"}"
+	orange       = "{\"color\":\"#FFA500\"}"
+	errorPattern = "{\"pattern\":\"error\"}" // pattern must exist in the Blink(1) UI tool
 )
 
 // flags
@@ -433,6 +432,7 @@ func main() {
 	if err != nil {
 		// Leave the same color, set a flag. If we get more than a critical number of these,
 		// set the color to blinking error pattern to tell the user we are in a failed state.
+		fmt.Fprint(debugOut, err.Error())
 		fmt.Fprint(os.Stdout, errorPattern)
 		return
 	}
@@ -444,12 +444,10 @@ func main() {
 		if err == nil {
 			delta := time.Since(startTime).Minutes()
 			switch {
-			case delta < -10: // more than 10 minutes until calendar event start
+			case delta < -5: // more than 5 minutes until calendar event start
 				blinkState = green
-			case delta < -2: // more than 2, but less than 10 minutes until calendar event starts
+			case delta < 0: // more than 0, but less than 5 minutes until calendar event starts
 				blinkState = yellow
-			case delta < 0: // more than 0, but less than 2 minutes until calendar event starts
-				blinkState = orangeFlashInfinite
 			default: // in a meeting
 				blinkState = orange
 			}
