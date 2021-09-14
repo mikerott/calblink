@@ -20,5 +20,9 @@ fi
 
 # check the google calendar
 export GOPATH=/Users/mrheinheimer/work/go
-cd /Users/mrheinheimer/work/go/src/github.com/mikerott/calblink || echo '{"pattern":"error"}' && exit
+cd /Users/mrheinheimer/work/go/src/github.com/mikerott/calblink
+if [ $? -ne 0 ]; then
+  echo '{"pattern":"error"}'
+  exit
+fi
 /usr/local/go/bin/go run calblink.go
