@@ -1,5 +1,23 @@
 #!/bin/bash
-#echo '{"color":"#446688"}'
+
+# to test, uncomment next 2 lines and wait a minute for calblink to run this script
+# echo '{"color":"#446688"}'
+# exit
+
+# check if zoom is running
+if ps aux | grep "/Applications/zoom.us.app/Contents/MacOS/zoom.us" | grep -v grep; then
+  echo '{"color":"#FF0000"}'
+  exit
+fi
+
+# don't call google calendar API if between 7pm and 8am
+hour=$(date +%H)
+if ((hour >= 19 || hour < 8)); then
+  echo '{"color":"#000000"}'
+  exit
+fi
+
+# check the google calendar
 export GOPATH=/Users/mrheinheimer/work/go
 cd /Users/mrheinheimer/work/go/src/github.com/mikerott/calblink
-/usr/local/bin/go run calblink.go
+/usr/local/go/bin/go run calblink.go

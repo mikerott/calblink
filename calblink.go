@@ -112,12 +112,12 @@ type prefLayout struct {
 }
 
 var (
-	black            = "{\"color\":\"#000000\"}"
-	green            = "{\"color\":\"#00FF00\"}"
-	yellow           = "{\"color\":\"#FFFF00\"}"
-	red              = "{\"color\":\"#FF0000\"}"
-	redFlashInfinite = "{\"pattern\":\"red flash infinite\"}" // pattern must exist in the Blink(1) UI tool
-	errorPattern     = "{\"pattern\":\"error\"}"              // pattern must exist in the Blink(1) UI tool
+	black               = "{\"color\":\"#000000\"}"
+	green               = "{\"color\":\"#00FF00\"}"
+	yellow              = "{\"color\":\"#FFFF00\"}"
+	orange              = "{\"color\":\"#FFA500\"}"
+	orangeFlashInfinite = "{\"pattern\":\"orange flash infinite\"}" // pattern must exist in the Blink(1) UI tool
+	errorPattern        = "{\"pattern\":\"error\"}"                 // pattern must exist in the Blink(1) UI tool
 )
 
 // flags
@@ -332,7 +332,7 @@ func printStartInfo(userPrefs *userPrefs) {
 		}
 	}
 	if len(skipDays) > 0 {
-		fmt.Fprintln(debugOut, "Skip days: " + skipDays)
+		fmt.Fprintln(debugOut, "Skip days: "+skipDays)
 	}
 	timeString := ""
 	if userPrefs.startTime != nil {
@@ -449,9 +449,9 @@ func main() {
 			case delta < -2: // more than 2, but less than 10 minutes until calendar event starts
 				blinkState = yellow
 			case delta < 0: // more than 0, but less than 2 minutes until calendar event starts
-				blinkState = redFlashInfinite
+				blinkState = orangeFlashInfinite
 			default: // in a meeting
-				blinkState = red
+				blinkState = orange
 			}
 			fmt.Fprint(os.Stdout, blinkState)
 		} else {

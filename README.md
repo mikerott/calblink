@@ -38,6 +38,12 @@ To use calblink, you need the following:
 4.  Install the Google APIs for Go:
 
     ```
+    go mod vendor
+    ```
+
+    Or
+
+    ```
     go get -u google.golang.org/api/calendar/v3
     go get -u golang.org/x/oauth2/...
     ```
