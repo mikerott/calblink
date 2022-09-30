@@ -19,6 +19,7 @@ fi
 
 today=$(date +%Y%m%d)
 now=$(date +%H%M%S)
+warning=3
 
 # check the google (really macOS) calendar
 files=( $(find ~/Library/Calendars -name "*googlecom.ics" | xargs fgrep "DTSTART;TZID=America/Chicago:${today}T" | cut -d ":" -f1) )
@@ -44,7 +45,8 @@ do
       dtstart=${dtstart//[$'\t\r\n']}
       dtend=${dtend//[$'\t\r\n']}
       attendee=${attendee//[$'\t\r\n']}
-      if [ $attendee == "ACCE" ] && [ ($dtstart - 3) -lt $now ]; then
+      let diff=$((10#$dtstart))-$((10#$now))
+      if [ $attendee == "ACCE" ] && [ $diff -lt $warning ] && [ $diff -gt 0 ]; then
         echo '{"color":"#FFFF00"}'
         exit
       elif [ $attendee == "ACCE" ] && [ $dtstart -lt $now ] && [ $now -lt $dtend ]; then
