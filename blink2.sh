@@ -17,58 +17,55 @@ if ((hour < 7 || hour >= 19)); then
   exit
 fi
 
+#!/bin/bash
+
 today=$(date +%Y%m%d)
 now=$(date +%H%M%S)
-warning=3
+warning=300 # this is really 3 minutes, not 300 seconds
 
 # check the google (really macOS) calendar
 files=( $(find ~/Library/Calendars -name "*googlecom.ics" | xargs fgrep "DTSTART;TZID=America/Chicago:${today}T" | cut -d ":" -f1) )
-for i in "${files[@]}"
+for f in "${files[@]}"
 do
-  while IFS="" read -r p || [ -n "$p" ]
+  IFS=$'\n' lines=( $(sed -n '/^BEGIN:VEVENT/,/^END:VEVENT/p' $f) )
+  for line in "${lines[@]}"
   do
-    if [[ $p =~ ^SUMMARY:* ]]; then
-      summary=$(echo "$p" | cut -c 9-)
+    line=${line//[$'\t\r\n']}
+    if [[ $line =~ ^SUMMARY:* ]]; then
+      summary=$(echo "$line" | cut -c 9-)
     fi
-    if [[ $p == DTSTART\;TZID=America/Chicago:${today}T* ]]; then
-      dtstart=$(echo "$p" | rev | cut -d"T" -f1 | rev)
+    if [[ $line == DTSTART\;TZID=America/Chicago:${today}T* ]]; then
+      dtstart=$(echo "$line" | rev | cut -d"T" -f1 | rev)
     fi
-    if [[ $p == DTEND\;TZID=America/Chicago:${today}T* ]]; then
-      dtend=$(echo "$p" | rev | cut -d"T" -f1 | rev)
+    if [[ $line == DTEND\;TZID=America/Chicago:${today}T* ]]; then
+      dtend=$(echo "$line" | rev | cut -d"T" -f1 | rev)
     fi
-    if [[ $p =~ ^.*mrheinheimer.*PARTSTAT.*$ ]]; then
-      attendee=$(echo "$p" | rev | cut -d"=" -f1 | rev)
+    if [[ $line =~ ^.*mrheinheimer.*PARTSTAT.*$ ]]; then
+      attendee=$(echo "$line" | rev | cut -d"=" -f1 | rev)
     fi
-    if [ -n "$dtstart" ] && [ -n "$dtend" ] && [ -n "$summary" ] && [ -n "$attendee" ]; then
-      # we've collected all the info we need for this segment
-      summary=${summary//[$'\t\r\n']}
-      dtstart=${dtstart//[$'\t\r\n']}
-      dtend=${dtend//[$'\t\r\n']}
-      attendee=${attendee//[$'\t\r\n']}
-      let diff=$((10#$dtstart))-$((10#$now))
-      if [ $attendee == "ACCE" ] && [ $diff -lt $warning ] && [ $diff -gt 0 ]; then
-        echo '{"color":"#FFFF00"}'
-        exit
-      elif [ $attendee == "ACCE" ] && [ $dtstart -lt $now ] && [ $now -lt $dtend ]; then
-        echo '{"color":"#FF0000"}'
-        exit
-        #echo "BLARG FILE: $i"
-        #echo "BLARG SUMMARY: $summary"
-        #echo "BLARG START: $dtstart"
-        #echo "BLARG END: $dtend"
-        #echo "BLARG STATUS: $attendee"
-        #echo ""
-      fi
-      segmentdone=true
+  done
+
+  # all lines we care about have been read
+  if [[ $attendee == "ACCE" ]] || [ -z $attendee ]; then # I accepted an invite or it's an event I made
+    let diff=$((10#$dtstart))-$((10#$now))
+    if [ $diff -lt $warning ] && [ $diff -gt 0 ]; then
+      echo '{"color":"#FFFF00"}'
+      exit
+    elif [ $dtstart -lt $now ] && [ $now -lt $dtend ]; then
+      echo '{"color":"#FF0000"}'
+      exit
+      echo "BLARG FILE: $i"
+      echo "BLARG SUMMARY: $summary"
+      echo "BLARG START: $dtstart"
+      echo "BLARG END: $dtend"
+      echo "BLARG STATUS: $attendee"
+      echo ""
     fi
-    if [[ $p =~ ^BEGIN.*$ ]] || [ -n "$segmentdone" ]; then
-      unset summary
-      unset dtstart
-      unset dtend
-      unset attendee
-      unset segmentdone
-    fi
-  done < $i
+  fi
+  unset summary
+  unset dtstart
+  unset dtend
+  unset attendee
 done
 
 echo '{"color":"#00FF00"}'
