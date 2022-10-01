@@ -10,9 +10,9 @@ LED to change colors based on your next meeting. The colors it will use are:
 1. Configure MacOS native Calendar app to sync with your Google calendar, but not
    too frequently, so you don't use up your Google Calendar API quota.
 
-2. Set a cronjob (crontab -e) to run `blink2.sh > file.out` at whatever frequency you like.
+2. Grant Blink1Control2 "Full Disk Access" in the Privacy tab of Security & Privacy system prefs
 
-3. Set up Blink1Control2 to read file.out ah whatever frequency you like.
+3. Set up Blink1Control2 to run the blink2.sh script (which reads files on the disk)  at whatever frequency you like.
 
 ## Legal
 

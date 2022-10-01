@@ -24,7 +24,7 @@ now=$(date +%H%M%S)
 warning=300 # this is really 3 minutes, not 300 seconds
 
 # check the google (really macOS) calendar
-files=( $(find ~/Library/Calendars -name "*googlecom.ics" | xargs fgrep "DTSTART;TZID=America/Chicago:${today}T" | cut -d ":" -f1) )
+files=( $(find /Users/mrheinheimer/Library/Calendars -name "*googlecom.ics" | xargs fgrep "DTSTART;TZID=America/Chicago:${today}T" | cut -d ":" -f1) )
 for f in "${files[@]}"
 do
   IFS=$'\n' lines=( $(sed -n '/^BEGIN:VEVENT/,/^END:VEVENT/p' $f) )
