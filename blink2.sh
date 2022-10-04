@@ -6,14 +6,14 @@
 
 # check if zoom is running
 if ps aux | grep "/Applications/zoom.us.app/Contents/MacOS/zoom.us" | grep -v grep; then
-  echo '{"color":"#FF0000"}'
+  echo '{"color":"#FF0000","summary":"Zoom is running"}'
   exit
 fi
 
 # Turn the light off during off hours
 hour=$(date +%H)
 if ((hour < 7 || hour >= 19)); then
-  echo '{"color":"#000000"}'
+  echo '{"color":"#000000","summary":"Outside normal work hours"}'
   exit
 fi
 
@@ -41,32 +41,32 @@ do
       dtend=$(echo "$line" | rev | cut -d"T" -f1 | rev)
     fi
     if [[ $line =~ ^.*mrheinheimer.*PARTSTAT.*$ ]]; then
-      attendee=$(echo "$line" | rev | cut -d"=" -f1 | rev)
+      status=$(echo "$line" | rev | cut -d"=" -f1 | rev)
     fi
   done
 
   # all lines we care about have been read
-  if [[ $attendee == "ACCE" ]] || [ -z $attendee ]; then # I accepted an invite or it's an event I made
+  if [[ $status == "ACCE" ]] || [ -z $status ]; then # I accepted an invite or it's an event I made
     let diff=$((10#$dtstart))-$((10#$now))
     if [ $diff -lt $warning ] && [ $diff -gt 0 ]; then
-      echo '{"color":"#FFFF00"}'
+      echo "{\"color\":\"#FFFF00\",\"summary\":\"$summary\",\"status\":\"$status\"}"
       exit
     elif [ $dtstart -lt $now ] && [ $now -lt $dtend ]; then
-      echo '{"color":"#FF0000"}'
+      echo "{\"color\":\"#FF0000\",\"summary\":\"$summary\",\"status\":\"$status\"}"
       exit
-      echo "BLARG FILE: $i"
+      echo "BLARG FILE: $f"
       echo "BLARG SUMMARY: $summary"
       echo "BLARG START: $dtstart"
       echo "BLARG END: $dtend"
-      echo "BLARG STATUS: $attendee"
+      echo "BLARG STATUS: $status"
       echo ""
     fi
   fi
   unset summary
   unset dtstart
   unset dtend
-  unset attendee
+  unset status
 done
 
-echo '{"color":"#00FF00"}'
-  exit
+echo '{"color":"#00FF00","status":"available"}'
+exit
