@@ -46,7 +46,7 @@ do
   done
 
   # all lines we care about have been read
-  if [[ $status == "ACCE" ]] || [ -z $status ]; then # I accepted an invite or it's an event I made
+  if [[ $status == "ACCE" ]] || [ -z $status ]; then # I accepted an invite or it's an event I (or Clockwise) made
     let diff=$((10#$dtstart))-$((10#$now))
     if [ $diff -lt $warning ] && [ $diff -gt 0 ]; then
       echo "{\"color\":\"#FFFF00\",\"summary\":\"$summary\",\"status\":\"$status\"}"
