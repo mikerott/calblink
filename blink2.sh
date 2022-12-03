@@ -28,6 +28,8 @@ files=( $(find /Users/mrheinheimer/Library/Calendars -name "*googlecom.ics" | xa
 for f in "${files[@]}"
 do
   IFS=$'\n' lines=( $(sed -n '/^BEGIN:VEVENT/,/^END:VEVENT/p' $f) )
+  organizer_is_me=true
+  status="I'm the creator of this calendar entry"
   for line in "${lines[@]}"
   do
     line=${line//[$'\t\r\n']}
@@ -43,10 +45,14 @@ do
     if [[ $line =~ ^.*mrheinheimer.*PARTSTAT.*$ ]]; then
       status=$(echo "$line" | rev | cut -d"=" -f1 | rev)
     fi
+    if [[ $line =~ ^ORGANIZER.*$ ]]; then
+      organizer_is_me=
+      status=UNKNOWN
+    fi
   done
 
   # all lines we care about have been read
-  if [[ $status == "ACCE" ]] || [ -z $status ]; then # I accepted an invite or it's an event I (or Clockwise) made
+  if [[ $status == "ACCE" ]] || [ ! -z $organizer_is_me ]; then # I accepted an invite or it's an event I (or Clockwise) made
     let diff=$((10#$dtstart))-$((10#$now))
     if [ $diff -lt $warning ] && [ $diff -gt 0 ]; then
       echo "{\"color\":\"#FFFF00\",\"summary\":\"$summary\",\"status\":\"$status\"}"
