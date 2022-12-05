@@ -11,7 +11,7 @@ if ps aux | grep "/Applications/zoom.us.app/Contents/MacOS/zoom.us" | grep -v gr
 fi
 
 # Turn the light off during off hours
-hour=$(date +%H)
+hour=$(date +%k | tr -d ' ')
 if ((hour < 7 || hour >= 19)); then
   echo '{"color":"#000000","summary":"Outside normal work hours"}'
   exit
@@ -52,9 +52,10 @@ do
   done
 
   # all lines we care about have been read
-  if [[ $status == "ACCE" ]] || [ ! -z $organizer_is_me ]; then # I accepted an invite or it's an event I (or Clockwise) made
+  if [[ $status == "ACCE" ]] || [ ! -z $organizer_is_me ]; then
+    # I accepted an invite or it's an event I (or Clockwise) made
     let diff=$((10#$dtstart))-$((10#$now))
-    if [ $diff -lt $warning ] && [ $diff -gt 0 ]; then
+    if ([ $diff -lt $warning ] && [ $diff -gt 0 ]) || [[ $summary == *"Clockwise"* ]]; then
       echo "{\"color\":\"#FFFF00\",\"summary\":\"$summary\",\"status\":\"$status\"}"
       exit
     elif [ $dtstart -lt $now ] && [ $now -lt $dtend ]; then
