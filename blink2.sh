@@ -55,7 +55,10 @@ do
   if [[ $status == "ACCE" ]] || [ ! -z $organizer_is_me ]; then
     # I accepted an invite or it's an event I (or Clockwise) made
     let diff=$((10#$dtstart))-$((10#$now))
-    if ([ $diff -lt $warning ] && [ $diff -gt 0 ]) || [[ $summary == *"Clockwise"* ]]; then
+    if ([ $diff -lt $warning ] && [ $diff -gt 0 ]); then
+      echo "{\"color\":\"#FFFF00\",\"summary\":\"$summary\",\"status\":\"$status\"}"
+      exit
+    elif ([ $dtstart -lt $now ] && [ $now -lt $dtend ]) && [[ $summary == *"Clockwise"* ]]; then
       echo "{\"color\":\"#FFFF00\",\"summary\":\"$summary\",\"status\":\"$status\"}"
       exit
     elif [ $dtstart -lt $now ] && [ $now -lt $dtend ]; then
